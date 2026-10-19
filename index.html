@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YKS Derece Asistanı</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --danger: #ef4444;
+      --success: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text); padding: 20px; line-height: 1.5; }
+
+    .container { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 20px; }
+    
+    /* Header & Countdown */
+    header {
+      background: linear-gradient(135deg, #312e81, #4338ca);
+      padding: 25px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    h1 { font-size: 2rem; margin-bottom: 10px; }
+    .timer-box { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
+    .time-unit { background: rgba(0,0,0,0.3); padding: 10px 18px; border-radius: 10px; min-width: 75px; }
+    .time-unit .num { font-size: 1.8rem; font-weight: bold; color: #38bdf8; }
+    .time-unit .label { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* Dream Section */
+    .dream-section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    .dream-input-group { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; flex-wrap: wrap; }
+    .dream-img-container {
+      width: 100%;
+      max-height: 300px;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0,0,0,0.2);
+    }
+    .dream-img-container img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Navigation Tabs */
+    .tabs { display: flex; gap: 10px; border-bottom: 2px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
+    .tab-btn {
+      background: var(--card-bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: 0.3s;
+    }
+    .tab-btn.active, .tab-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+    /* Content Cards */
+    .tab-content { display: none; background: var(--card-bg); padding: 20px; border-radius: 16px; border: 1px solid var(--border); }
+    .tab-content.active { display: block; }
+
+    /* Forms & Inputs */
+    .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+    label { font-size: 0.9rem; color: var(--text-muted); }
+    input, select, textarea {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px;
+      border-radius: 8px;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn-danger { background: var(--danger); }
+
+    /* Lists and Cards */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 15px; }
+    .item-card {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      padding: 15px;
+      border-radius: 12px;
+      position: relative;
+    }
+    .item-card img { width: 100%; border-radius: 8px; margin-top: 10px; max-height: 200px; object-fit: cover; }
+    .item-card .date-badge { font-size: 0.75rem; color: #38bdf8; background: rgba(56, 189, 248, 0.1); padding: 3px 8px; border-radius: 4px; }
+    .item-card .actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+
+    /* Calendar Styling */
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-top: 15px; }
+    .cal-header { font-weight: bold; padding: 10px; color: var(--accent); }
+    .cal-day {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      min-height: 80px;
+      padding: 5px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+    .cal-day .day-num { font-weight: bold; color: var(--text-muted); }
+    .cal-event { background: var(--accent); font-size: 0.7rem; padding: 2px 4px; border-radius: 4px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    @media (max-width: 600px) {
+      .timer-box { gap: 5px; }
+      .time-unit { min-width: 60px; padding: 8px; }
+      .time-unit .num { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header & YKS Countdown -->
+  <header>
+    <h1>🎯 YKS Hedef & Takip Paneli</h1>
+    <p>Hedefine Adım Adım İlerle!</p>
+    <div class="timer-box">
+      <div class="time-unit"><div class="num" id="days">00</div><div class="label">Gün</div></div>
+      <div class="time-unit"><div class="num" id="hours">00</div><div class="label">Saat</div></div>
+      <div class="time-unit"><div class="num" id="minutes">00</div><div class="label">Dakika</div></div>
+      <div class="time-unit"><div class="num" id="seconds">00</div><div class="label">Saniye</div></div>
+    </div>
+  </header>
+
+  <!-- Dream University & Department Section -->
+  <section class="dream-section">
+    <h2 style="margin-bottom: 10px;">🌟 Hayal Edilen Üniversite & Bölüm</h2>
+    <div class="dream-input-group">
+      <input type="text" id="dreamName" placeholder="Örn: İTÜ - Bilgisayar Mühendisliği" style="width: 300px;">
+      <input type="text" id="dreamImgUrl" placeholder="Fotoğraf URL Adresi Yapıştır" style="width: 300px;">
+      <button class="btn" onclick="saveDream()">Kaydet</button>
+    </div>
+    <div class="dream-img-container" id="dreamDisplay">
+      <p style="color: var(--text-muted);">Henüz bir fotoğraf eklenmedi.</p>
+    </div>
+  </section>
+
+  <!-- Navigation Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('questions')">❓ Yapılamayan Sorular</button>
+    <button class="tab-btn" onclick="switchTab('deneme')">📊 Deneme Netleri</button>
+    <button class="tab-btn" onclick="switchTab('topics')">📌 Eksik Konular</button>
+    <button class="tab-btn" onclick="switchTab('calendar')">📅 Çalışma Takvimi</button>
+  </div>
+
+  <!-- Tab 1: Yapılamayan Sorular -->
+  <div id="questions" class="tab-content active">
+    <h3>Soru Kutusu</h3>
+    <form onsubmit="addQuestion(event)" style="margin-top: 15px;">
+      <div class="form-group">
+        <label>Ders / Konu</label>
+        <input type="text" id="qSubject" placeholder="Örn: Matematik - Türev" required>
+      </div>
+      <div class="form-group">
+        <label>Soru / Çözüm Notu</label>
+        <textarea id="qNote" placeholder="Soruyla ilgili unutmaman gereken püf noktası..." rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Soru Fotoğraf URL (Opsiyonel)</label>
+        <input type="text" id="qImg" placeholder="Fotoğraf linki...">
+      </div>
+      <div class="form-group">
+        <label>Tekrar Edilecek Tarih</label>
+        <input type="date" id="qDate" required>
+      </div>
+      <button class="btn" type="submit">Soruyu Kaydet & Takvime Ekle</button>
+    </form>
+    <div class="card-grid" id="questionList"></div>
+  </div>
+
+  <!-- Tab 2: Deneme Netleri -->
+  <div id="deneme" class="tab-content">
+    <h3>Deneme Net Takibi</h3>
+    <form onsubmit="addDeneme(event)" style="margin-top: 15px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+        <div class="form-group">
+          <label>Deneme Adı</label>
+          <input type="text" id="dName" placeholder="Örn: 3D Türkiye Geneli TYT-1" required>
+        </div>
+        <div class="form-group">
+          <label>Türü</label>
+          <select id="dType"><option>TYT</option><option>AYT</option></select>
+        </div>
+        <div class="form-group">
+          <label>Toplam Net</label>
+          <input type="number" step="0.25" id="dNet" placeholder="Örn: 85.5" required>
+        </div>
+        <div class="form-group">
+          <label>Tarih</label>
+          <input type="date" id="dDate" required>
+        </div>
+      </div>
+      <button class="btn" type="submit">Net Kaydet</button>
+    </form>
+    <div class="card-grid" id="denemeList"></div>
+  </div>
+
+  <!-- Tab 3: Eksik Konular -->
+  <div id="topics" class="tab-content">
+    <h3>Eksik Konu Takibi</h3>
+    <form onsubmit="addTopic(event)" style="margin-top: 15px; display: flex; gap: 10px;">
+      <input type="text" id="tName" placeholder="Örn: Fizik - Elektrik ve Manyetizma" required style="flex: 1;">
+      <input type="date" id="tDate" required>
+      <button class="btn" type="submit">Konu Ekle</button>
+    </form>
+    <div class="card-grid" id="topicList"></div>
+  </div>
+
+  <!-- Tab 4: Takvim -->
+  <div id="calendar" class="tab-content">
+    <h3 id="calMonthYear">Aylık Takvim</h3>
+    <p style="font-size: 0.85rem; color: var(--text-muted);">Yapılacak soru tekrarları ve çalışma planın tarihlere göre burada görünür.</p>
+    <div class="calendar-grid" id="calendarGrid"></div>
+  </div>
+</div>
+
+<script>
+  // --- YKS SAYACI ---
+  // Tahmini YKS Tarihi (Haziran Ortası)
+  const yksDate = new Date("June 20, 2027 10:15:00").getTime();
+
+  function updateTimer() {
+    const now = new Date().getTime();
+    const distance = yksDate - now;
+
+    if (distance < 0) {
+      document.getElementById("days").innerText = "00";
+      return;
+    }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    document.getElementById("days").innerText = days < 10 ? "0" + days : days;
+    document.getElementById("hours").innerText = hours < 10 ? "0" + hours : hours;
+    document.getElementById("minutes").innerText = minutes < 10 ? "0" + minutes : minutes;
+    document.getElementById("seconds").innerText = seconds < 10 ? "0" + seconds : seconds;
+  }
+  setInterval(updateTimer, 1000);
+  updateTimer();
+
+  // --- HEDEF ÜNİVERSİTE VE FOTOĞRAF ---
+  function saveDream() {
+    const name = document.getElementById('dreamName').value;
+    const img = document.getElementById('dreamImgUrl').value;
+    const dreamData = { name, img };
+    localStorage.setItem('yks_dream', JSON.stringify(dreamData));
+    loadDream();
+  }
+
+  function loadDream() {
+    const dreamData = JSON.parse(localStorage.getItem('yks_dream'));
+    const display = document.getElementById('dreamDisplay');
+    if (dreamData) {
+      if(dreamData.name) document.getElementById('dreamName').value = dreamData.name;
+      if(dreamData.img) document.getElementById('dreamImgUrl').value = dreamData.img;
+      display.innerHTML = `
+        <div style="position:relative; width:100%; height:100%;">
+          ${dreamData.img ? `<img src="${dreamData.img}" alt="Hayal">` : ''}
+          <h3 style="position:absolute; bottom:10px; left:10px; background:rgba(0,0,0,0.7); padding:5px 15px; border-radius:8px;">${dreamData.name || ''}</h3>
+        </div>
+      `;
+    }
+  }
+
+  // --- TAB DEĞİŞTİRME ---
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    event.target.classList.add('active');
+    document.getElementById(tabId).classList.add('active');
+
+    if(tabId === 'calendar') renderCalendar();
+  }
+
+  // --- VERİ Saklama (LocalStorage) ---
+  let questions = JSON.parse(localStorage.getItem('yks_questions')) || [];
+  let denemeler = JSON.parse(localStorage.getItem('yks_denemeler')) || [];
+  let topics = JSON.parse(localStorage.getItem('yks_topics')) || [];
+
+  function saveData() {
+    localStorage.setItem('yks_questions', JSON.stringify(questions));
+    localStorage.setItem('yks_denemeler', JSON.stringify(denemeler));
+    localStorage.setItem('yks_topics', JSON.stringify(topics));
+    renderAll();
+  }
+
+  // --- SORU KUTUSU İŞLEMLERİ ---
+  function addQuestion(e) {
+    e.preventDefault();
+    const q = {
+      id: Date.now(),
+      subject: document.getElementById('qSubject').value,
+      note: document.getElementById('qNote').value,
+      img: document.getElementById('qImg').value,
+      date: document.getElementById('qDate').value
+    };
+    questions.push(q);
+    e.target.reset();
+    saveData();
+  }
+
+  function deleteQuestion(id) {
+    questions = questions.filter(q => q.id !== id);
+    saveData();
+  }
+
+  // --- DENEME İŞLEMLERİ ---
+  function addDeneme(e) {
+    e.preventDefault();
+    const d = {
+      id: Date.now(),
+      name: document.getElementById('dName').value,
+      type: document.getElementById('dType').value,
+      net: document.getElementById('dNet').value,
+      date: document.getElementById('dDate').value
+    };
+    denemeler.push(d);
+    e.target.reset();
+    saveData();
+  }
+
+  function deleteDeneme(id) {
+    denemeler = denemeler.filter(d => d.id !== id);
+    saveData();
+  }
+
+  // --- EKİK KONU İŞLEMLERİ ---
+  function addTopic(e) {
+    e.preventDefault();
+    const t = {
+      id: Date.now(),
+      name: document.getElementById('tName').value,
+      date: document.getElementById('tDate').value,
+      completed: false
+    };
+    topics.push(t);
+    e.target.reset();
+    saveData();
+  }
+
+  function toggleTopic(id) {
+    topics = topics.map(t => t.id === id ? {...t, completed: !t.completed} : t);
+    saveData();
+  }
+
+  function deleteTopic(id) {
+    topics = topics.filter(t => t.id !== id);
+    saveData();
+  }
+
+  // --- EKRANA YAZDIRMA ---
+  function renderAll() {
+    // Render Questions
+    const qList = document.getElementById('questionList');
+    qList.innerHTML = questions.map(q => `
+      <div class="item-card">
+        <span class="date-badge">Tekrar Tarihi: ${q.date}</span>
+        <h4 style="margin-top:5px;">${q.subject}</h4>
+        <p style="font-size:0.9rem; color:var(--text-muted); margin-top:5px;">${q.note}</p>
+        ${q.img ? `<img src="${q.img}" alt="Soru Görseli">` : ''}
+        <div class="actions">
+          <button class="btn btn-danger" style="padding:4px 8px; font-size:0.8rem;" onclick="deleteQuestion(${q.id})">Sil</button>
+        </div>
+      </div>
+    `).join('');
+
+    // Render Deneme
+    const dList = document.getElementById('denemeList');
+    dList.innerHTML = denemeler.map(d => `
+      <div class="item-card">
+        <span class="date-badge">${d.date} - ${d.type}</span>
+        <h4 style="margin-top:5px;">${d.name}</h4>
+        <p style="font-size:1.4rem; font-weight:bold; color:var(--success); margin-top:5px;">${d.net} Net</p>
+        <div class="actions">
+          <button class="btn btn-danger" style="padding:4px 8px; font-size:0.8rem;" onclick="deleteDeneme(${d.id})">Sil</button>
+        </div>
+      </div>
+    `).join('');
+
+    // Render Topics
+    const tList = document.getElementById('topicList');
+    tList.innerHTML = topics.map(t => `
+      <div class="item-card" style="opacity: ${t.completed ? '0.5' : '1'}">
+        <span class="date-badge">Hedef Tarih: ${t.date}</span>
+        <h4 style="margin-top:5px; text-decoration: ${t.completed ? 'line-through' : 'none'}">${t.name}</h4>
+        <div class="actions">
+          <button class="btn" style="padding:4px 8px; font-size:0.8rem;" onclick="toggleTopic(${t.id})">${t.completed ? 'Tamamlandı' : 'Tamamla'}</button>
+          <button class="btn btn-danger" style="padding:4px 8px; font-size:0.8rem;" onclick="deleteTopic(${t.id})">Sil</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // --- TAKVİM RENDER ---
+  function renderCalendar() {
+    const grid = document.getElementById('calendarGrid');
+    grid.innerHTML = '';
+
+    const daysOfWeek = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+    daysOfWeek.forEach(d => {
+      grid.innerHTML += `<div class="cal-header">${d}</div>`;
+    });
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // Pazartesi'den başlaması için index ayarı
+    let startIndex = firstDay === 0 ? 6 : firstDay - 1;
+
+    for (let i = 0; i < startIndex; i++) {
+      grid.innerHTML += `<div class="cal-day" style="opacity: 0.2;"></div>`;
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      
+      const dayQuestions = questions.filter(q => q.date === dateStr);
+      const dayTopics = topics.filter(t => t.date === dateStr);
+
+      let eventsHtml = '';
+      dayQuestions.forEach(q => eventsHtml += `<div class="cal-event" style="background:#6366f1;">❓ Soru: ${q.subject}</div>`);
+      dayTopics.forEach(t => eventsHtml += `<div class="cal-event" style="background:#10b981;">📌 Konu: ${t.name}</div>`);
+
+      grid.innerHTML += `
+        <div class="cal-day">
+          <div class="day-num">${day}</div>
+          ${eventsHtml}
+        </div>
+      `;
+    }
+  }
+
+  // İlk açılış yüklemeleri
+  loadDream();
+  renderAll();
+</script>
+</body>
+</html>
